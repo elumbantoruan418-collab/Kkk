@@ -1,35 +1,47 @@
-name: dasborat_kirigakure
-description: "Base Dashboard Flutter App"
-publish_to: 'none'
-version: 1.0.0+1
+name: Build Android APK
 
-environment:
-  sdk: '>=3.0.0 <4.0.0'
+on:
+  push:
+    branches:
+      - main
+      - utama
+  workflow_dispatch:
 
-dependencies:
-  flutter:
-    sdk: flutter
-  webview_flutter: ^4.4.2
-  http: ^1.2.0
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
-  flutter_launcher_icons: ^0.13.1 # Tool khusus untuk generate logo/icon APK otomatis
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
-# Konfigurasi Logo/Icon APK kamu
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/logo.png" # Letak file logo yang akan kita pakai
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
 
-flutter:
-  uses-material-design: true
-  # Mendaftarkan folder assets agar logo bisa dibaca oleh sistem build
-  assets:
-    - assets/icon/
+      - name: Create Dummy Android Folder
+        run: |
+          mkdir -p android/app/src/main
+          curl -L -o android/build.gradle https://raw.githubusercontent.com/flutter/flutter/main/packages/flutter_tools/templates/app_shared/android.tmpl/build.gradle
+          curl -L -o android/app/build.gradle https://raw.githubusercontent.com/flutter/flutter/main/packages/flutter_tools/templates/app_shared/android.tmpl/app/build.gradle
+          echo '<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android"></manifest>' > android/app/src/main/AndroidManifest.xml
 
-flutter:
-  assets:
-    - assets/web/
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
