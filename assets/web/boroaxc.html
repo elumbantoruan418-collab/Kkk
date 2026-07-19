@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winz XTR - Dashboard</title>
+    <style>
+        /* FULL PROTEKSI ANTI-SALIN TEKS */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* CONTAINER UTAMA */
+        .dashboard-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* HEADER DASHBOARD */
+        .header {
+            background: #111827;
+            border: 1px solid rgba(45, 78, 216, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(45, 78, 216, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #38BDF8;
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ADE80;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px 5px;
+        }
+
+        /* LIST DATA USER */
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .user-card {
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .user-card:hover {
+            transform: scale(1.01);
+            border-color: rgba(45, 78, 216, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2D4ED8, #38BDF8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .user-details h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .user-details p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .role-badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38BDF8;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* LOADING & ERROR */
+        .loading, .error-msg {
+            text-align: center;
+            padding: 30px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .error-msg {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="dashboard-container">
+        <!-- Header Aplikasi -->
+        <div class="header">
+            <h1>WINZ XTR DASHBOARD</h1>
+            <span class="status-badge">● SYSTEM ONLINE</span>
+        </div>
+
+        <div class="section-title">Manajemen Pengguna</div>
+
+        <!-- Tempat data user dirender oleh JS -->
+        <div id="user-container" class="user-list">
+            <div class="loading">⏳ Memuat data dari server backend...</div>
+        </div>
+    </div>
+
+    <script>
+        // Mengambil file host dinamis langsung dari GitHub kamu
+        const githubUrl = "https://raw.githubusercontent.com/elumbantoruan418-collab/Eid/main/tokens.json";
+
+        // Fungsi mendapatkan URL VPS aktif dari array JSON GitHub
+        async function getActiveVpsUrl() {
+            try {
+                const response = await fetch(githubUrl);
+                const data = await response.json();
+                
+                // Mencari konfigurasi vps_url di dalam array
+                const hostConfig = data.find(item => item.vps_url);
+                return hostConfig ? hostConfig.vps_url : "http://localhost:3000";
+            } catch (error) {
+                console.error("Gagal memuat host dinamis, beralih ke localhost.");
+                return "http://localhost:3000";
+            }
+        }
+
+        async function fetchUsers() {
+            const container = document.getElementById('user-container');
+            
+            try {
+                // 1. Dapatkan host VPS yang aktif terlebih dahulu
+                const currentVps = await getActiveVpsUrl();
+                const dataEndpoint = `${currentVps}/api/users`;
+
+                // 2. Ambil data users dari endpoint backend yang valid
+                const response = await fetch(dataEndpoint);
+                if (!response.ok) throw new Error("Gagal mengambil data dari endpoint");
+                
+                const users = await response.json();
+                
+                // Bersihkan text loading
+                container.innerHTML = "";
+
+                if (users.length === 0) {
+                    container.innerHTML = `<div class="loading">Tidak ada data pengguna tersedia.</div>`;
+                    return;
+                }
+
+                // Perulangan untuk memasukkan data user ke dalam HTML
+                users.forEach(user => {
+                    const firstLetter = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+                    const role = user.role ? user.role : 'member';
+                    
+                    const cardHTML = `
+                        <div class="user-card">
+                            <div class="user-info">
+                                <div class="avatar">${firstLetter}</div>
+                                <div class="user-details">
+                                    <h3>${user.name}</h3>
+                                    <p>ID Pengguna: #${user.id}</p>
+                                </div>
+                            </div>
+                            <div class="role-badge">${role}</div>
+                        </div>
+                    `;
+                    container.innerHTML += cardHTML;
+                });
+
+            } catch (error) {
+                console.error("Dashboard Error:", error);
+                container.innerHTML = `
+                    <div class="error-msg">
+                        ❌ Gagal memuat data!<br>Pastikan API Server aktif di host tujuan kamu.
+                    </div>
+                `;
+            }
+        }
+
+        // Jalankan fungsi fetch saat halaman selesai dimuat
+        window.onload = fetchUsers;
+    </script>
+</body>
+</html>
+
