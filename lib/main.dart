@@ -12,10 +12,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Kirigakure App',
+      title: 'XTR WINZ 5.6.2',
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        brightness: Brightness.light, // ✨ Mengubah tema dasar menjadi warna terang/putih
       ),
       home: const DashboardWebView(),
     );
@@ -37,16 +37,16 @@ class _DashboardWebViewState extends State<DashboardWebView> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      // ⚠️ GANTI LINK DI BAWAH INI dengan link GitHub Pages hasil dari repository barumu!
+      ..setBackgroundColor(const Color(0xFFFFFFFF)) // ✨ Mengubah latar belakang WebView jadi putih pekat
       ..loadRequest(
-        Uri.parse('https://elumbantoruan418-collab.github.io/panel-xtr/'),
+        Uri.parse('https://elumbantoruan418-collab.github.io/Dasboroat_nya-base-winz/'),
       ); 
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // ✨ Memastikan dasar halaman aplikasi tetap putih
       body: SafeArea(
         child: WebViewWidget(controller: _controller),
       ),
