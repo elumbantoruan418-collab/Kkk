@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: const DashboardWebView(),
     );
@@ -34,7 +35,6 @@ class DashboardWebView extends StatefulWidget {
 class _DashboardWebViewState extends State<DashboardWebView> {
   WebViewController? _controller;
   bool _isLoading = true;
-  String? _errorMessage;
 
   // Link Raw JSON tempat menyimpan vps_url
   final String _jsonUrl =
@@ -76,10 +76,10 @@ class _DashboardWebViewState extends State<DashboardWebView> {
       debugPrint("Gagal mengambil config URL dari GitHub: $e");
     }
 
-    // Inisialisasi WebViewController dengan URL hasil fetch
+    // Inisialisasi WebViewController dengan background putih
     final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFF0B0F19)) // Disesuaikan dengan warna background index.html
+      ..setBackgroundColor(Colors.white)
       ..loadRequest(Uri.parse(targetUrl));
 
     setState(() {
@@ -91,18 +91,22 @@ class _DashboardWebViewState extends State<DashboardWebView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0F19),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: _isLoading
             ? const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: Color(0xFF38BDF8)),
+                    CircularProgressIndicator(color: Colors.blueAccent),
                     SizedBox(height: 15),
                     Text(
                       'Menghubungkan ke Server Winz XTR...',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
