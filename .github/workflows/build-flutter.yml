@@ -1,0 +1,57 @@
+name: Build Flutter APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_url:
+        description: 'URL ke file project zip'
+        required: false
+        default: ''
+      tag:
+        description: 'Tag release'
+        required: false
+        default: 'v1.0.0'
+      build_type:
+        description: 'Tipe build'
+        required: false
+        default: 'apk'
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Download & Extract Zip
+        run: |
+          if [ -n "${{ github.event.inputs.zip_url }}" ]; then
+            curl -L "${{ github.event.inputs.zip_url }}" -o project.zip
+          fi
+          if [ -f "project.zip" ]; then
+            unzip -o project.zip
+          fi
+
+      - name: Build APK
+        run: |
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
