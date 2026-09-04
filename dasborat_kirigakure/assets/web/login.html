@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winz XTR - Login</title>
+    <style>
+        * { -webkit-user-select: none; user-select: none; box-sizing: border-box; }
+        body { background-color: #0b0f19; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; padding: 20px; }
+        .login-card { background: #111827; border: 1px solid rgba(45, 78, 216, 0.3); border-radius: 16px; padding: 30px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
+        h2 { color: #2D4ED8; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #1f2937; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; outline: none; }
+        input:focus { border-color: #2D4ED8; }
+        .btn { background: linear-gradient(90deg, #2D4ED8, #1e3a8a); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
+        #msg { color: #ef4444; font-size: 13px; margin-top: 10px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="login-card">
+        <h2>WINZ XTR LOGIN</h2>
+        <input type="text" id="username" placeholder="Masukkan Username">
+        <input type="password" id="password" placeholder="Masukkan Password">
+        <button class="btn" onclick="prosesLogin()">MASUK</button>
+        <div id="msg"></div>
+    </div>
+
+    <script>
+        // Arahkan ke endpoint login Node.js kamu yang bertugas ngecek tokens.json
+        const apiUrl = "http://localhost:3000/api/login"; 
+
+        async function prosesLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const msg = document.getElementById('msg');
+
+            if(!u || !p) {
+                msg.innerHTML = "Username dan password wajib diisi!";
+                return;
+            }
+
+            msg.style.color = "#38BDF8";
+            msg.innerHTML = "Memeriksa akun...";
+
+            try {
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                
+                const data = await res.json();
+                
+                if(res.ok && data.success) {
+                    // Jika sukses login, simpan session atau langsung lempar ke index.html
+                    window.location.href = "boroatcd.html"; 
+                } else {
+                    msg.style.color = "#ef4444";
+                    msg.innerHTML = data.message || "Username atau Password salah!";
+                }
+            } catch(e) {
+                msg.style.color = "#ef4444";
+                msg.innerHTML = "Gagal terhubung ke API server lokal.";
+            }
+        }
+    </script>
+</body>
+</html>
+
+

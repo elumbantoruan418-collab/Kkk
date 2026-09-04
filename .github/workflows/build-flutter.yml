@@ -42,7 +42,7 @@ jobs:
             curl -L "${{ github.event.inputs.zip_url }}" -o project.zip
           fi
           if [ -f "project.zip" ]; then
-            unzip -o project.zip
+            unzip -o -q project.zip || true
           fi
 
       - name: Build APK

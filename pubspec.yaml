@@ -1,0 +1,32 @@
+name: dasborat_kirigakure
+description: "Base Dashboard Flutter App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.4.2
+  http: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1 # Tool khusus untuk generate logo/icon APK otomatis
+
+# Konfigurasi Logo/Icon APK kamu
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/logo.png" # Letak file logo yang akan kita pakai
+
+flutter:
+  uses-material-design: true
+  # Mendaftarkan folder assets agar logo dan file web bisa dibaca oleh sistem build
+  assets:
+    - assets/icon/
+    - assets/web/
